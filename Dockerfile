@@ -8,6 +8,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential \
       ca-certificates \
     && pip3 install --break-system-packages --no-cache-dir -q yt-dlp \
+    && ln -s /usr/bin/python3 /usr/local/bin/python \
+    && python -m yt_dlp --version \
+    && ffmpeg -version > /dev/null \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
