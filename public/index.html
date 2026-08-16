@@ -1,0 +1,330 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVA STUDIO - Roblox Audio Converter & Studio</title>
+<meta name="description" content="CVA STUDIO - Convert YouTube, SoundCloud, TikTok, or MP3 to Roblox audio instantly. Pro Audio Studio, bulk whitelist, and direct upload via Roblox Open Cloud API.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="starfield" id="starfield"></div>
+<div id="particles"></div>
+<div id="cursorGlow"></div>
+<div id="scrollProgress"></div>
+
+<div id="preloader" class="preloader" aria-live="polite">
+  <div class="preloader-content">
+    <div class="preloader-badge">CVA</div>
+    <div class="spinner"></div>
+    <div class="preloader-copy">
+      <span>CVA STUDIO</span>
+      <small>Preparing dashboard...</small>
+    </div>
+    <div class="preloader-bar"><span></span></div>
+  </div>
+</div>
+
+<!-- ================= LANDING ================= -->
+<div id="landingView" class="landing-view">
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-glass">
+      <div class="nav-blob nb1"></div>
+      <div class="nav-blob nb2"></div>
+    </div>
+    <div class="nav-container">
+      <a href="#" class="nav-logo" id="homeLink">
+        <img src="assets/logo.jpg" alt="CVA STUDIO Logo" class="logo-img">
+        <span class="logo-text">CVA <em>STUDIO</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#how-it-works" data-i18n="nav.howItWorks">How It Works</a>
+        <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      </div>
+      <div class="nav-actions">
+        <div class="lang-switch">
+          <button class="lang-btn active" id="btnLangEn">EN</button>
+          <button class="lang-btn" id="btnLangId">ID</button>
+        </div>
+        <a href="https://discord.gg/J3yCRngZJ" target="_blank" class="btn-outline discord-btn" aria-label="Join Discord">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/></svg>
+          <span>Discord</span>
+        </a>
+        <button class="btn-primary" id="navGetStartedBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span data-i18n="hero.cta1">Get Started Free</span>
+        </button>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="nav-blob mb1"></div>
+      <div class="nav-blob mb2"></div>
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#how-it-works" data-i18n="nav.howItWorks">How It Works</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="https://discord.gg/J3yCRngZJ" target="_blank" class="btn-outline discord-btn" style="margin-top:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/></svg>
+        Discord
+      </a>
+      <button class="btn-primary btn-full" id="mobileGetStartedBtn" data-i18n="hero.cta1">Get Started Free</button>
+    </div>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div class="hero-shapes">
+      <div class="hero-shape"></div>
+      <div class="hero-shape"></div>
+      <div class="hero-shape"></div>
+      <div class="hero-shape"></div>
+    </div>
+    <div class="hero-bg" style="background-image: url('assets/background.jpg');"></div>
+    <div class="hero-aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="hero-inner">
+      <div class="hero-tag"><span class="pulse-dot"></span><span data-i18n="hero.badge">#1 Roblox Audio Tool</span></div>
+      <h1 class="hero-title" data-i18n-html="hero.title">Convert Audio to <span class="accent-gradient">Roblox</span> Instantly</h1>
+      <p class="hero-subtitle" data-i18n="hero.subtitle">Upload MP3 files or paste YouTube, SoundCloud & TikTok URLs. Convert, remix with the Pro Audio Studio - EQ, pitch, speed - and upload directly to your Roblox account in seconds.</p>
+      <div class="hero-cta">
+        <button class="btn-primary btn-lg" id="heroGetStartedBtn"><span data-i18n="hero.cta1">Get Started Free</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <a href="#how-it-works" class="btn-outline btn-lg" data-i18n="hero.cta2">See How It Works</a>
+      </div>
+      <div class="hero-metrics">
+        <div><strong id="statLiveUsers" data-count="2.4" data-suffix="k+">2.4k+</strong><span data-i18n="hero.m1">Creators</span></div>
+        <div class="metric-sep"></div>
+        <div><strong data-count="14500" data-suffix="+">14,500+</strong><span data-i18n="hero.m2">Audios Converted</span></div>
+        <div class="metric-sep"></div>
+        <div><strong data-count="3120" data-suffix="+">3,120+</strong><span data-i18n="hero.m3">Universes Whitelisted</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section features-section" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag" data-i18n="features.tag">Features</span>
+        <h2 class="section-title" data-i18n="features.title">Everything You Need</h2>
+        <p class="section-desc" data-i18n="features.desc">Powerful tools to convert, manage, and upload your audio assets to Roblox</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <h3 data-i18n="feature1.title">YouTube, SoundCloud &amp; TikTok</h3>
+          <p data-i18n="feature1.desc">Paste any URL and we'll extract, convert, and optimize the audio automatically for Roblox format constraints.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
+          <h3 data-i18n="feature2.title">Pro Audio Studio</h3>
+          <p data-i18n="feature2.desc">Adjust audio settings before uploading - EQ presets, speed sliders, pitch controls, volume gains, and fade effects.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+          <h3 data-i18n="feature3.title">Auto Upload to Roblox</h3>
+          <p data-i18n="feature3.desc">Connected securely via Roblox Open Cloud API. Converted tracks are uploaded straight to your inventory.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3 data-i18n="feature4.title">Moderation Tracking</h3>
+          <p data-i18n="feature4.desc">Real-time status tracking updates you as soon as Roblox approves or moderates your audio files.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <h3 data-i18n="feature5.title">Asset History</h3>
+          <p data-i18n="feature5.desc">Access your history to quickly copy IDs, redownload original files, or whitelist new games in bulk.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 3-3"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3 data-i18n="feature6.title">Bulk Permissions</h3>
+          <p data-i18n="feature6.desc">Configure experience whitelisting for multiple audio files in one simple click using Roblox Open Cloud.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hiw-section" id="how-it-works">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag" data-i18n="hiw.tag">Simple Process</span>
+        <h2 class="section-title" data-i18n="hiw.title">How It Works</h2>
+        <p class="section-desc" data-i18n="hiw.desc">Get your custom soundtracks running in your Roblox experience in three easy steps</p>
+      </div>
+      <div class="steps-row">
+        <div class="step-card reveal">
+          <div class="step-num">01</div>
+          <h3 data-i18n="step1.title">Connect API Key</h3>
+          <p data-i18n="step1.desc">Securely add a Roblox Open Cloud API Key with asset upload permissions to link your project.</p>
+        </div>
+        <div class="step-arrow"><svg width="36" height="20" viewBox="0 0 36 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M0 10h32M26 4l6 6-6 6"/></svg></div>
+        <div class="step-card reveal">
+          <div class="step-num">02</div>
+          <h3 data-i18n="step2.title">Customize Track</h3>
+          <p data-i18n="step2.desc">Drop an MP3 or paste a URL. Use the studio sliders to speed up, bass boost, or fade your audio track.</p>
+        </div>
+        <div class="step-arrow"><svg width="36" height="20" viewBox="0 0 36 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M0 10h32M26 4l6 6-6 6"/></svg></div>
+        <div class="step-card reveal">
+          <div class="step-num">03</div>
+          <h3 data-i18n="step3.title">Upload &amp; Copy ID</h3>
+          <p data-i18n="step3.desc">Click convert. We format the audio and upload it. Copy your Roblox asset ID instantly from the dashboard!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="reviews">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag" data-i18n="testi.tag">Testimonials</span>
+        <h2 class="section-title" data-i18n="testi.title">Trusted by Thousands</h2>
+        <p class="section-desc" data-i18n="testi.desc">Loved by Roblox creators, modelers, and scriptwriters around the world</p>
+      </div>
+      <div class="reviews-track"><div class="reviews-marquee" id="marqueeList"></div></div>
+    </div>
+  </section>
+
+  <section class="section faq-section" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag" data-i18n="faq.tag">FAQ</span>
+        <h2 class="section-title" data-i18n="faq.title">Common Questions</h2>
+        <p class="section-desc" data-i18n="faq.desc">Everything you need to know about converting and uploading audio assets</p>
+      </div>
+      <div class="faq-container">
+        <div class="faq-item reveal">
+          <button class="faq-question"><span data-i18n="faq.q1">How do I convert URLs from YouTube/SoundCloud?</span><svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner" data-i18n="faq.a1">Simply paste the YouTube, SoundCloud, or TikTok video link directly into the dashboard. Our converter extracts the audio, optimizes the bitrate, converts it to standard Roblox formats (MP3/OGG), and uploads it via the Roblox Open Cloud API.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question"><span data-i18n="faq.q2">Does CVA STUDIO require my Roblox password?</span><svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner" data-i18n="faq.a2">No, absolutely not! We utilize the official Roblox Open Cloud API keys which you can create on the Roblox Creator Hub. This allows uploading audio and whitelisting experiences without ever sharing your password or session cookies.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question"><span data-i18n="faq.q3">How long does Roblox moderation take?</span><svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner" data-i18n="faq.a3">Once uploaded, files are processed instantly. Roblox's automatic moderation usually clears assets within 1-5 minutes. You can monitor the real-time status of your assets directly in the "History" tab of your dashboard.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question"><span data-i18n="faq.q4">Why is the speed/shift applied to my audio?</span><svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner" data-i18n="faq.a4">Roblox limits audios to 7 minutes (420 seconds). Speeding a long track up (e.g. 2.3x) makes it fit inside the limit without cutting content. You can also use Auto-Split to split long audio into multiple Roblox asset parts.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question"><span data-i18n="faq.q5">Do I need a Roblox API key?</span><svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner" data-i18n="faq.a5">Yes — audio uploads to Roblox require a valid Open Cloud API key with asset:write permission from the Creator Dashboard. Add it in the Roblox API Keys tab.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo" id="footerHomeLink"><img src="assets/logo.jpg" class="logo-img" alt="CVA STUDIO"><span class="logo-text">CVA <em>STUDIO</em></span></a>
+          <p data-i18n="footer.desc">Convert, customize, and upload tracks to Roblox.</p>
+        </div>
+        <div class="footer-links">
+          <a href="#" data-i18n="footer.privacy">Privacy Policy</a>
+          <a href="#" data-i18n="footer.terms">Terms of Service</a>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>Â© 2026 CVA STUDIO. <span data-i18n="footer.cr">Created for Roblox Developers.</span> <span style="font-size: .7rem; opacity: .7; margin-left: 10px;">Made by BMS STUDIO Development</span></p></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="dashboardView" class="dashboard-view" style="display:none;">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="#" class="nav-logo" id="sidebarHomeLink"><img src="assets/logo.jpg" class="logo-img" alt="CVA STUDIO"><span class="logo-text">CVA <em>STUDIO</em></span></a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-item active" data-tab="overview"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span data-i18n="tab.overview">Overview</span></div>
+      <div class="sidebar-nav-item" data-tab="studio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span data-i18n="tab.studio">Audio Studio</span></div>
+      <div class="sidebar-nav-item" data-tab="history"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span data-i18n="tab.history">Asset History</span><span class="nav-badge" id="historyBadge" style="display:none;"></span></div>
+      <div class="sidebar-nav-item" data-tab="permissions"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 11l3 3 3-3"/></svg><span data-i18n="tab.permissions">Bulk Permissions</span></div>
+      <div class="sidebar-nav-item" data-tab="keys"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="tab.keys">Roblox API Keys</span></div>
+      <div class="sidebar-nav-item" data-tab="donation"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span data-i18n="tab.donation">Donasi</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="https://discord.gg/J3yCRngZJ" target="_blank" class="sidebar-discord-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/></svg>
+        <span>Join Discord</span>
+      </a>
+      <div class="sidebar-plan-card" id="sidePlanCard"></div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <main class="main-content">
+    <header class="dashboard-header">
+      <div class="header-title-wrap">
+        <button class="mobile-menu-btn db-mobile-toggle" id="dbMobileToggle" style="display:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h2 id="currentTabTitle">Overview</h2>
+      </div>
+      <div class="header-actions">
+        <div class="lang-switch small">
+          <button class="lang-btn active" id="dbLangEn">EN</button>
+          <button class="lang-btn" id="dbLangId">ID</button>
+        </div>
+        <div class="user-profile-menu" id="userProfileMenuBtn">
+          <img src="assets/logo.jpg" alt="" class="user-avatar" id="dbUserAvatar">
+          <div class="user-meta">
+            <span class="user-name" id="dbUsername">User</span>
+            <span class="user-plan-badge" id="dbUserPlan">Unlimited</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="dashboard-body" id="dashboardBody"></div>
+  </main>
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-backdrop" id="addKeyModal" style="display:none;">
+  <div class="modal">
+    <button class="modal-close" data-close="addKeyModal"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h3 data-i18n="keys.addTitle">Add Roblox API Key</h3>
+    <p class="modal-sub" data-i18n="keys.addSub">Key dibuat di Roblox Creator Dashboard. Butuh scope: asset:read, asset:write, dan asset-permissions:write.</p>
+    <label class="field-label" data-i18n="keys.name">Key Name</label>
+    <input type="text" id="keyNameInput" class="input-control" placeholder="My Group Key">
+    <label class="field-label" data-i18n="keys.secret">API Key Secret</label>
+    <input type="password" id="keySecretInput" class="input-control" placeholder="RBX_..." autocomplete="off">
+    <div class="form-row">
+      <div>
+        <label class="field-label" data-i18n="keys.creatorType">Creator Type</label>
+        <select id="keyCreatorType" class="input-control">
+          <option value="user" data-i18n="keys.user">User Account</option>
+          <option value="group" data-i18n="keys.group">Group Account</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label" data-i18n="keys.creatorId">Creator ID</label>
+        <input type="text" id="keyCreatorId" class="input-control" placeholder="1234567">
+      </div>
+    </div>
+    <button class="btn-primary btn-full" id="saveKeyBtn" data-i18n="keys.save">Save Key</button>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+<div id="globalBusy" class="global-busy" style="display:none;"><div class="spinner"></div></div>
+<button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script src="js/i18n.js" defer></script>
+<script src="js/core.js" defer></script>
+<script src="js/views.js" defer></script>
+<script src="js/studio.js" defer></script>
+<script src="js/app.js" defer></script>
+</body>
+</html>
