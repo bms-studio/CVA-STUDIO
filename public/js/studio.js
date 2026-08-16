@@ -97,6 +97,8 @@ function applyPreset(preset) {
   updateFxChips();
 }
 
+let activePresetId = '';
+
 function saveCurrentAsPreset() {
   const p = currentFxParams();
   const name = (window.prompt(t('studio.presetName'), p.eq !== 'normal' ? p.eq + ' Preset' : 'My Preset') || '').trim();
@@ -113,31 +115,42 @@ function saveCurrentAsPreset() {
     }
   });
   saveUserPresets(list);
-  refreshPresetOptions();
-  const sel = $('#fxPresetSelect');
-  if (sel) sel.value = list[list.length - 1].id;
+  activePresetId = list[list.length - 1].id;
+  const label = $('#fxPresetLabel');
+  if (label) label.textContent = name;
   const del = $('#fxPresetDelBtn');
   if (del) del.style.display = 'inline-flex';
+  refreshPresetOptions();
   toast(t('studio.presetSaved'), 'success');
 }
 
 function deleteSelectedPreset() {
-  const sel = $('#fxPresetSelect');
-  if (!sel || !String(sel.value).startsWith('u_')) return;
-  saveUserPresets(loadUserPresets().filter((x) => x.id !== sel.value));
+  if (!String(activePresetId).startsWith('u_')) return;
+  saveUserPresets(loadUserPresets().filter((x) => x.id !== activePresetId));
+  activePresetId = '';
+  const label = $('#fxPresetLabel');
+  if (label) label.textContent = t('studio.presetPlaceholder');
+  const del = $('#fxPresetDelBtn');
+  if (del) del.style.display = 'none';
   refreshPresetOptions();
   toast(t('studio.presetDeleted'), 'success');
 }
 
+function presetItemsHtml() {
+  const user = loadUserPresets();
+  const builtin = BUILTIN_PRESETS.map((p) =>
+    `<button type="button" class="fx-preset-item-apply" data-preset="${esc(p.id)}" role="option">${esc(p.name)}</button>`).join('');
+  const userHtml = user.length
+    ? `<div class="fx-preset-group-label">${esc(t('studio.presetUser'))}</div>` +
+      user.map((p) =>
+        `<button type="button" class="fx-preset-item-apply" data-preset="${esc(p.id)}" role="option">${esc(p.name)}</button>`).join('')
+    : '';
+  return `<div class="fx-preset-group-label">${esc(t('studio.presetBuiltin'))}</div>${builtin}${userHtml}`;
+}
+
 function refreshPresetOptions() {
-  const group = $('#fxUserPresetGroup');
-  const sel = $('#fxPresetSelect');
-  const del = $('#fxPresetDelBtn');
-  if (group) {
-    group.innerHTML = loadUserPresets().map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
-  }
-  if (sel && ![...sel.options].some((o) => o.value === sel.value)) sel.value = '';
-  if (del) del.style.display = sel && String(sel.value).startsWith('u_') ? 'inline-flex' : 'none';
+  const menu = $('#fxPresetMenu');
+  if (menu) menu.innerHTML = presetItemsHtml();
 }
 
 /* ---------- FX graph ---------- */
@@ -668,13 +681,13 @@ async function renderStudio(isLangRefresh) {
 
         <div class="preset-row">
           <label class="field-label mb-0" style="white-space:nowrap;">${icon('beaker', 14)} ${esc(t('studio.preset'))}</label>
-          <select id="fxPresetSelect" class="input-control">
-            <option value="">${esc(t('studio.presetPlaceholder'))}</option>
-            <optgroup label="${esc(t('studio.presetBuiltin'))}">
-              ${BUILTIN_PRESETS.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}
-            </optgroup>
-            <optgroup label="${esc(t('studio.presetUser'))}" id="fxUserPresetGroup"></optgroup>
-          </select>
+          <div class="fx-preset-dd" id="fxPresetDD">
+            <button type="button" class="fx-preset-trigger" id="fxPresetTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="fx-preset-label" id="fxPresetLabel">${esc(t('studio.presetPlaceholder'))}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fx-preset-menu" id="fxPresetMenu" role="listbox" style="display:none;"></div>
+          </div>
           <button class="chip" id="fxPresetSaveBtn" title="${esc(t('studio.presetSave'))}">${icon('star', 14)} ${esc(t('studio.presetSaveBtn'))}</button>
           <button class="chip danger icon-btn" id="fxPresetDelBtn" title="${esc(t('studio.presetDelete'))}" style="display:none;">${icon('trash', 14)}</button>
         </div>
@@ -851,15 +864,43 @@ async function renderStudio(isLangRefresh) {
     rebuildFxGraph();
     updateFxChips();
   });
-  $('#fxPresetSelect').addEventListener('change', () => {
-    const sel = $('#fxPresetSelect');
+  const presetTrigger = $('#fxPresetTrigger');
+  const presetMenu = $('#fxPresetMenu');
+  const presetDD = $('#fxPresetDD');
+  presetTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = presetMenu.style.display === 'block';
+    presetMenu.style.display = open ? 'none' : 'block';
+    presetTrigger.setAttribute('aria-expanded', String(!open));
+  });
+  presetMenu.addEventListener('click', (e) => {
+    const btn = e.target.closest('.fx-preset-item-apply');
+    if (!btn) return;
+    const id = btn.dataset.preset;
+    const preset = String(id).startsWith('u_')
+      ? loadUserPresets().find((x) => x.id === id)
+      : BUILTIN_PRESETS.find((x) => x.id === id);
+    if (!preset) return;
+    applyPreset(preset);
+    activePresetId = id;
+    $('#fxPresetLabel').textContent = preset.name;
     const del = $('#fxPresetDelBtn');
-    if (del) del.style.display = String(sel.value).startsWith('u_') ? 'inline-flex' : 'none';
-    if (!sel.value) return;
-    const preset = String(sel.value).startsWith('u_')
-      ? loadUserPresets().find((x) => x.id === sel.value)
-      : BUILTIN_PRESETS.find((x) => x.id === sel.value);
-    if (preset) { applyPreset(preset); toast(t('studio.presetApply'), 'success'); }
+    if (del) del.style.display = String(id).startsWith('u_') ? 'inline-flex' : 'none';
+    presetMenu.style.display = 'none';
+    presetTrigger.setAttribute('aria-expanded', 'false');
+    toast(t('studio.presetApply'), 'success');
+  });
+  document.addEventListener('click', (e) => {
+    if (presetDD && !presetDD.contains(e.target)) {
+      presetMenu.style.display = 'none';
+      presetTrigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      presetMenu.style.display = 'none';
+      presetTrigger.setAttribute('aria-expanded', 'false');
+    }
   });
   $('#fxPresetSaveBtn').addEventListener('click', saveCurrentAsPreset);
   $('#fxPresetDelBtn').addEventListener('click', deleteSelectedPreset);
