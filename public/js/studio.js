@@ -54,6 +54,92 @@ function currentFxParams() {
   };
 }
 
+/* ---------- FX Presets / Templates ---------- */
+const BUILTIN_PRESETS = [
+  { id: 'original', name: 'Original', params: {} },
+  { id: 'bassboost', name: 'Bass Boost', params: { eq: 'bass', amplify: 6, echo: true } },
+  { id: 'nightcore', name: 'Nightcore', params: { speed: 1.5, pitch: 3, amplify: 2, echo: true } },
+  { id: 'slowdeep', name: 'Slow & Deep', params: { pitch: -3, eq: 'bass', reverb: true } },
+  { id: 'lofi', name: 'Lo-Fi', params: { amplify: -3, eq: 'vintage', reverb: true, fadeIn: true, fadeOut: true } },
+  { id: 'radio', name: 'Radio Voice', params: { eq: 'vocals', amplify: 2, radio: true } },
+  { id: 'energetic', name: 'High Energy', params: { speed: 2, amplify: 4, eq: 'treble', tremolo: true } },
+  { id: 'echospace', name: 'Echo Space', params: { echo: true, reverb: true, fadeOut: true } }
+];
+
+function loadUserPresets() {
+  try { return JSON.parse(localStorage.getItem('cva_fx_presets') || '[]'); } catch (e) { return []; }
+}
+function saveUserPresets(list) {
+  try { localStorage.setItem('cva_fx_presets', JSON.stringify(list)); } catch (e) {}
+}
+
+function applyPreset(preset) {
+  const p = Object.assign({
+    speed: 1, amplify: 0, pitch: 0, eq: 'normal',
+    fadeIn: false, fadeOut: false, autoSplit: true,
+    echo: false, reverb: false, chorus: false, tremolo: false,
+    vibrato: false, radio: false, reverse: false
+  }, preset.params || {});
+  const set = (id, v) => { const el = $(id); if (el) el.value = v; };
+  set('#fxSpeed', p.speed);
+  $('#outSpeed').textContent = Number(p.speed).toFixed(2) + 'x';
+  $('#speedPresets').querySelectorAll('.chip').forEach((x) => x.classList.toggle('active', x.dataset.speed === String(p.speed)));
+  set('#fxAmplify', p.amplify);
+  $('#outAmplify').textContent = (Number(p.amplify) > 0 ? '+' : '') + p.amplify + ' dB';
+  set('#fxPitch', p.pitch);
+  $('#outPitch').textContent = (Number(p.pitch) > 0 ? '+' : '') + p.pitch + ' st';
+  $('#fxEqRow').querySelectorAll('.chip').forEach((x) => x.classList.toggle('active', x.dataset.eq === p.eq));
+  $('#fxFadeIn').checked = !!p.fadeIn;
+  $('#fxFadeOut').checked = !!p.fadeOut;
+  if ($('#fxAutoSplit')) $('#fxAutoSplit').checked = p.autoSplit !== false;
+  $('#fxExtraRow').querySelectorAll('.chip').forEach((x) => x.classList.toggle('active', !!p[x.dataset.fx]));
+  rebuildFxGraph();
+  updateFxChips();
+}
+
+function saveCurrentAsPreset() {
+  const p = currentFxParams();
+  const name = (window.prompt(t('studio.presetName'), p.eq !== 'normal' ? p.eq + ' Preset' : 'My Preset') || '').trim();
+  if (!name) return;
+  const list = loadUserPresets();
+  list.push({
+    id: 'u_' + Date.now(),
+    name,
+    params: {
+      speed: p.speed, amplify: p.amplify, pitch: p.pitch, eq: p.eq,
+      fadeIn: p.fadeIn, fadeOut: p.fadeOut, autoSplit: p.autoSplit,
+      echo: p.echo, reverb: p.reverb, chorus: p.chorus, tremolo: p.tremolo,
+      vibrato: p.vibrato, radio: p.radio, reverse: p.reverse
+    }
+  });
+  saveUserPresets(list);
+  refreshPresetOptions();
+  const sel = $('#fxPresetSelect');
+  if (sel) sel.value = list[list.length - 1].id;
+  const del = $('#fxPresetDelBtn');
+  if (del) del.style.display = 'inline-flex';
+  toast(t('studio.presetSaved'), 'success');
+}
+
+function deleteSelectedPreset() {
+  const sel = $('#fxPresetSelect');
+  if (!sel || !String(sel.value).startsWith('u_')) return;
+  saveUserPresets(loadUserPresets().filter((x) => x.id !== sel.value));
+  refreshPresetOptions();
+  toast(t('studio.presetDeleted'), 'success');
+}
+
+function refreshPresetOptions() {
+  const group = $('#fxUserPresetGroup');
+  const sel = $('#fxPresetSelect');
+  const del = $('#fxPresetDelBtn');
+  if (group) {
+    group.innerHTML = loadUserPresets().map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  }
+  if (sel && ![...sel.options].some((o) => o.value === sel.value)) sel.value = '';
+  if (del) del.style.display = sel && String(sel.value).startsWith('u_') ? 'inline-flex' : 'none';
+}
+
 /* ---------- FX graph ---------- */
 function rebuildFxGraph() {
   const audioEl = $('#previewAudio');
@@ -580,6 +666,19 @@ async function renderStudio(isLangRefresh) {
         <button type="button" class="sec-head" data-sec="fx"><span>${icon('split', 14)} ${esc(t('studio.fx'))}</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
         <div class="sec-body closed" data-sec="fx">
 
+        <div class="preset-row">
+          <label class="field-label mb-0" style="white-space:nowrap;">${icon('beaker', 14)} ${esc(t('studio.preset'))}</label>
+          <select id="fxPresetSelect" class="input-control">
+            <option value="">${esc(t('studio.presetPlaceholder'))}</option>
+            <optgroup label="${esc(t('studio.presetBuiltin'))}">
+              ${BUILTIN_PRESETS.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}
+            </optgroup>
+            <optgroup label="${esc(t('studio.presetUser'))}" id="fxUserPresetGroup"></optgroup>
+          </select>
+          <button class="chip" id="fxPresetSaveBtn" title="${esc(t('studio.presetSave'))}">${icon('star', 14)} ${esc(t('studio.presetSaveBtn'))}</button>
+          <button class="chip danger icon-btn" id="fxPresetDelBtn" title="${esc(t('studio.presetDelete'))}" style="display:none;">${icon('trash', 14)}</button>
+        </div>
+
         <div class="flex-between">
           <label class="field-label mb-0">${esc(t('studio.fx'))}</label>
           <button class="chip" id="fxResetBtn">${icon('refresh', 14)} reset</button>
@@ -752,6 +851,19 @@ async function renderStudio(isLangRefresh) {
     rebuildFxGraph();
     updateFxChips();
   });
+  $('#fxPresetSelect').addEventListener('change', () => {
+    const sel = $('#fxPresetSelect');
+    const del = $('#fxPresetDelBtn');
+    if (del) del.style.display = String(sel.value).startsWith('u_') ? 'inline-flex' : 'none';
+    if (!sel.value) return;
+    const preset = String(sel.value).startsWith('u_')
+      ? loadUserPresets().find((x) => x.id === sel.value)
+      : BUILTIN_PRESETS.find((x) => x.id === sel.value);
+    if (preset) { applyPreset(preset); toast(t('studio.presetApply'), 'success'); }
+  });
+  $('#fxPresetSaveBtn').addEventListener('click', saveCurrentAsPreset);
+  $('#fxPresetDelBtn').addEventListener('click', deleteSelectedPreset);
+  refreshPresetOptions();
   $('#fxFadeIn').addEventListener('change', () => { rebuildFxGraph(); updateFxChips(); });
   $('#fxFadeOut').addEventListener('change', () => { rebuildFxGraph(); updateFxChips(); });
 

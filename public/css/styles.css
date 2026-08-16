@@ -1378,6 +1378,9 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
 .premium-gate p { color: var(--t2); font-size: 0.88rem; max-width: 400px; margin: 0 auto 20px; }
 
 /* Misc */
+.preset-row { display: flex; align-items: center; gap: 6px; margin: 10px 0 14px; }
+.preset-row select.input-control { flex: 1; min-width: 0; padding: 7px 10px; font-size: 0.76rem; }
+.preset-row .chip { padding: 7px 10px; font-size: 0.72rem; white-space: nowrap; }
 .batch-input { font-family: var(--mono); font-size: 0.8rem; min-height: 96px; resize: vertical; }
 .flex { display: flex; align-items: center; gap: 12px; }
 .flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
