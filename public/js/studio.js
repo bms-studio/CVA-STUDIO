@@ -1093,19 +1093,26 @@ function showConsoleFor(jobId) {
 function renderConsole(data) {
   const consoleEl = $('#processConsole');
   if (!consoleEl) return;
-  consoleEl.innerHTML = (data.log || []).map((line) => {
+  const lines = (data.log || []).map((line) => {
     let cls = 'info';
     if (/gagal|error|✗|⚠|500/i.test(line)) cls = 'err';
     else if (/selesai|berhasil|✓|approved|done|Asset ID/i.test(line)) cls = 'ok';
     else if (/menunggu|moderasi|demo|poller|antre/i.test(line)) cls = 'warn';
     return `<span class="${cls}">${esc(line)}</span>`;
-  }).join('\n') || '<span class="info">(kosong)</span>';
+  }).join('\n');
+  consoleEl.innerHTML = lines || consolePlaceholder(data.status);
   consoleEl.scrollTop = 99999;
   const pill = $('#consoleStatusPill');
   if (pill) pill.innerHTML = statusPill(data.status);
   const fill = $('#consoleProgressFill');
   const map = { queued: 8, processing: 45, uploaded: 85, approved: 100, rejected: 100, error: 100 };
   if (fill) fill.style.width = (map[data.status] || 10) + '%';
+}
+
+function consolePlaceholder(status) {
+  const spin = `${icon('load', 14)} `;
+  if (status === 'queued') return `<span class="warn">${spin}${esc(t('studio.waitingQueue'))}</span>`;
+  return `<span class="info">${spin}${esc(t('studio.prepareLog'))}</span>`;
 }
 
 function renderConsoleResult(data) {
