@@ -70,6 +70,7 @@ mediaRouter.get('/preview', async (req, res) => {
 app.use('/api/media', mediaRouter);
 
 // ---- APP ROUTES ----
+app.use('/api/user', require('./routes/user'));
 app.use('/api/keys', require('./routes/keys'));
 app.use('/api', require('./routes/convert'));
 app.use('/api', require('./routes/report'));

@@ -207,6 +207,16 @@ function switchLang(lang) {
 }
 
 /* ---------- Session (auto-guest, always succeeds) ---------- */
+function getDeviceId() {
+  let id = null;
+  try { id = localStorage.getItem('cva_device_id'); } catch (e) {}
+  if (!id) {
+    id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('dev_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+    try { localStorage.setItem('cva_device_id', id); } catch (e) {}
+  }
+  return id;
+}
+
 async function refreshUser() {
   try {
     const data = await api('/api/auth/me');
@@ -221,7 +231,7 @@ async function refreshUser() {
 async function ensureSession() {
   if (await refreshUser()) return true;
   try {
-    await api('/api/auth/guest', { method: 'POST', body: '{}' });
+    await api('/api/auth/guest', { method: 'POST', body: JSON.stringify({ deviceId: getDeviceId() }) });
     return await refreshUser();
   } catch (e) {
     return false;

@@ -91,19 +91,25 @@ try {
   if (!keyCols.includes('last_used')) db.exec('ALTER TABLE api_keys ADD COLUMN last_used INTEGER');
 } catch (e) { /* tabel mungkin belum ada saat migrasi pertama */ }
 
+try {
+  const userCols = db.prepare('PRAGMA table_info(users)').all().map((c) => c.name);
+  if (!userCols.includes('device_id')) db.exec('ALTER TABLE users ADD COLUMN device_id TEXT');
+} catch (e) { /* tabel mungkin belum ada saat migrasi pertama */ }
+
 function getUser(discordId) {
   return db.prepare('SELECT * FROM users WHERE discord_id = ?').get(String(discordId)) || null;
 }
 
-function upsertUser({ discord_id, username, avatar }) {
+function upsertUser({ discord_id, username, avatar, deviceId }) {
   db.prepare(
-    `INSERT INTO users (discord_id, username, avatar, created_at, last_seen)
-     VALUES (@discord_id, @username, @avatar, @created_at, @last_seen)
+    `INSERT INTO users (discord_id, username, avatar, device_id, created_at, last_seen)
+     VALUES (@discord_id, @username, @avatar, @device_id, @created_at, @last_seen)
      ON CONFLICT(discord_id) DO UPDATE SET
        username = excluded.username,
        avatar   = CASE WHEN excluded.avatar != '' THEN excluded.avatar ELSE users.avatar END,
+       device_id = CASE WHEN excluded.device_id != '' THEN excluded.device_id ELSE users.device_id END,
        last_seen = excluded.last_seen`
-  ).run({ discord_id, username, avatar, created_at: now(), last_seen: now() });
+  ).run({ discord_id, username, avatar, device_id: deviceId || '', created_at: now(), last_seen: now() });
   return getUser(discord_id);
 }
 

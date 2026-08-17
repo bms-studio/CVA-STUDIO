@@ -71,6 +71,18 @@ function loadUserPresets() {
 }
 function saveUserPresets(list) {
   try { localStorage.setItem('cva_fx_presets', JSON.stringify(list)); } catch (e) {}
+  try { api('/api/user/templates', { method: 'POST', body: JSON.stringify({ templates: list }) }).catch(() => {}); } catch (e) {}
+}
+/* Pulihkan template dari server bila localStorage kosong */
+async function syncPresetsFromServer() {
+  if (loadUserPresets().length) return;
+  try {
+    const d = await api('/api/user/templates');
+    if (Array.isArray(d.templates) && d.templates.length) {
+      saveUserPresets(d.templates);
+      refreshPresetOptions();
+    }
+  } catch (e) { /* server mati / belum siap */ }
 }
 
 function applyPreset(preset) {
@@ -905,6 +917,7 @@ async function renderStudio(isLangRefresh) {
   $('#fxPresetSaveBtn').addEventListener('click', saveCurrentAsPreset);
   $('#fxPresetDelBtn').addEventListener('click', deleteSelectedPreset);
   refreshPresetOptions();
+  syncPresetsFromServer();
   $('#fxFadeIn').addEventListener('change', () => { rebuildFxGraph(); updateFxChips(); });
   $('#fxFadeOut').addEventListener('change', () => { rebuildFxGraph(); updateFxChips(); });
 

@@ -36,9 +36,19 @@ function getOrCreateGuest(req, res) {
     const u = store.getUser(id);
     if (u) return u;
   }
+  // Cookie hilang/kedaluwarsa → pulihkan identitas lama via device_id dari localStorage
+  const deviceId = String((req.body && req.body.deviceId) || (req.query && req.query.deviceId) || '').slice(0, 64);
+  if (deviceId) {
+    const byDevice = store.db.prepare('SELECT * FROM users WHERE device_id = ? LIMIT 1').get(deviceId);
+    if (byDevice) {
+      store.db.prepare('UPDATE users SET device_id = ? WHERE discord_id = ?').run(deviceId, byDevice.discord_id);
+      setSession(res, byDevice.discord_id);
+      return byDevice;
+    }
+  }
   const key = crypto.randomBytes(8).toString('hex');
   id = 'guest_' + key;
-  store.upsertUser({ discord_id: id, username: 'CVA STUDIO', avatar: '' });
+  store.upsertUser({ discord_id: id, username: 'CVA STUDIO', avatar: '', deviceId });
   setSession(res, id);
   return store.getUser(id);
 }
