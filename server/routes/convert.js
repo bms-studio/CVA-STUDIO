@@ -122,7 +122,8 @@ router.post('/convert', requireAuth, upload.single('file'), async (req, res) => 
       filePath: req.file ? req.file.path : '',
       assetName,
       apiKeyId,
-      params
+      params,
+      meta: { ip: req.ip, ua: req.headers['user-agent'] || '', at: Date.now() }
     });
 
     webhook.trackActivity(user.discord_id);
@@ -159,7 +160,7 @@ router.post('/convert/batch', requireAuth, async (req, res) => {
         params
       });
       ids.push(job.id);
-      pushJob({ historyId: job.id, userId: user.discord_id, sourceType: 'url', sourceUrl: urls[i], filePath: '', assetName: job.asset_name || baseName, apiKeyId, params });
+      pushJob({ historyId: job.id, userId: user.discord_id, sourceType: 'url', sourceUrl: urls[i], filePath: '', assetName: job.asset_name || baseName, apiKeyId, params, meta: { ip: req.ip, ua: req.headers['user-agent'] || '', at: Date.now() } });
     }
     webhook.trackActivity(user.discord_id, urls.length);
     res.json({ ok: true, ids });

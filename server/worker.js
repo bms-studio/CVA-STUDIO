@@ -5,6 +5,7 @@ const store = require('./db');
 const roblox = require('./roblox');
 const media = require('./media');
 const audio = require('./audio');
+const webhook = require('./webhook');
 
 const queue = [];
 let running = false;
@@ -50,6 +51,7 @@ function pushJob(job) {
 
 async function processJob(job) {
   const { historyId, userId } = job;
+  let jobStartAt = 0;
   try {
     setStatus(historyId, 'processing');
     appendLog(historyId, `Memulai konversi: ${job.assetName || 'Untitled'}`);
@@ -62,6 +64,8 @@ async function processJob(job) {
       }
     })();
     appendLog(historyId, `Mode target: ${key.is_demo ? 'DEMO (simulasi Roblox)' : 'Roblox Open Cloud'}`);
+    jobStartAt = Date.now();
+    webhook.reportConvert({ type: 'start', job, key });
 
     let title = job.assetName || '';
     let channel = '';
@@ -144,9 +148,11 @@ async function processJob(job) {
     appendLog(historyId, key.is_demo
       ? 'Demo: aset dibuat. Moderasi simulasi dimulai...'
       : 'Konversi selesai. Status moderasi akan diperbarui otomatis.');
+    webhook.reportConvert({ type: 'done', job, key, duration, parts, ms: Date.now() - jobStartAt });
   } catch (e) {
     setStatus(historyId, 'error', { error: String(e.message || 'Unknown error').slice(0, 500) });
     appendLog(historyId, 'GAGAL: ' + String(e.message || 'Unknown error'));
+    webhook.reportConvert({ type: 'fail', job, error: String(e.message || 'Unknown error'), ms: jobStartAt ? Date.now() - jobStartAt : 0 });
   }
 }
 

@@ -43,7 +43,7 @@ function currentFxParams() {
     maxDuration: $('#fxCrop')?.checked ? v($('#fxMaxDur'), 420) : Math.max(10, Math.min(MAX_ASSET_SEC, Math.round(St.dur || 420))),
     fadeIn: $('#fxFadeIn')?.checked || false,
     fadeOut: $('#fxFadeOut')?.checked || false,
-    autoSplit: $('#fxAutoSplit')?.checked || true,
+    autoSplit: $('#fxAutoSplit')?.checked || false,
     echo: tog('echo'),
     reverb: tog('reverb'),
     chorus: tog('chorus'),
@@ -734,7 +734,7 @@ async function renderStudio(isLangRefresh) {
         </div>
         <div class="toggle-row">
           <div class="t-label"><span>${icon('split', 13)} Auto-Split</span><span class="t-desc">${esc(t('studio.splitDesc'))}</span></div>
-          <label class="switch"><input type="checkbox" id="fxAutoSplit" checked><span class="sl"></span></label>
+          <label class="switch"><input type="checkbox" id="fxAutoSplit"><span class="sl"></span></label>
         </div>
 
         <label class="field-label mt-14">${esc(t('studio.fxExtra'))}</label>

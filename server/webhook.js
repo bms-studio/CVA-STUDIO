@@ -118,4 +118,70 @@ async function reportServerError(req, err) {
   });
 }
 
-module.exports = { send, resolveLocation, trackActivity, reportClientError, reportServerError };
+/* Parsing device dari User-Agent */
+function parseUa(ua) {
+  const s = String(ua || '');
+  const browser = /Edg\//.test(s) ? 'Edge' : /OPR\//.test(s) ? 'Opera' : /Chrome\//.test(s) ? 'Chrome' : /Safari\//.test(s) ? 'Safari' : /Firefox\//.test(s) ? 'Firefox' : /curl|node|python/i.test(s) ? 'API/CLI' : 'Lainnya';
+  const os = /Windows/.test(s) ? 'Windows' : /Android/.test(s) ? 'Android' : /iPhone|iPad/.test(s) ? 'iOS' : /Mac OS X/.test(s) ? 'macOS' : /Linux/.test(s) ? 'Linux' : 'Lainnya';
+  return { browser, os };
+}
+
+/* Event konversi lengkap & detail: mulai / selesai / gagal */
+async function reportConvert({ type, job, key, duration, parts, ms, error }) {
+  const ua = parseUa(job.meta && job.meta.ua);
+  const fx = job.params || {};
+  const effects = ['echo', 'reverb', 'chorus', 'tremolo', 'vibrato', 'radio', 'reverse', 'fadeIn', 'fadeOut']
+    .filter((k) => fx[k])
+    .map((k) => k.replace(/^fade/, 'fade '));
+  const fxSummary = [
+    fx.speed && Number(fx.speed) !== 1 ? 'speed ×' + fx.speed : '',
+    fx.pitch ? 'pitch ' + (fx.pitch > 0 ? '+' : '') + fx.pitch : '',
+    fx.amplify ? (fx.amplify > 0 ? '+' : '') + fx.amplify + 'dB' : '',
+    fx.eq && fx.eq !== 'normal' ? 'eq:' + fx.eq : ''
+  ].filter(Boolean).join(' ');
+
+  const colors = { start: 0x55aaff, done: 0x22aa55, fail: 0xff5555 };
+  const titles = {
+    start: '▶️ Konversi dimulai',
+    done: '✅ Konversi selesai',
+    fail: '❌ Konversi gagal'
+  };
+  const fields = [
+    { name: '👤 User', value: '`' + (job.userId || '?') + '`', inline: true },
+    { name: '🎵 Lagu', value: String(job.assetName || 'Untitled').slice(0, 120), inline: true },
+    { name: '📥 Sumber', value: job.sourceType === 'url' ? String(job.sourceUrl).slice(0, 90) : '📁 Upload file', inline: true }
+  ];
+  if (duration > 0) {
+    const mm = Math.floor(duration / 60), ss = String(Math.floor(duration % 60)).padStart(2, '0');
+    fields.push({ name: '⏱️ Durasi', value: `${mm}:${ss}`, inline: true });
+  }
+  if (fxSummary || effects.length) {
+    fields.push({ name: '🎛️ FX', value: (fxSummary || 'none') + (effects.length ? '\n' + effects.map((e) => '`' + e + '`').join(' ') : ''), inline: true });
+  }
+  if (fx.maxDuration && duration > 0 && fx.maxDuration < duration) {
+    const cm = Math.floor(fx.maxDuration / 60), cs = String(Math.floor(fx.maxDuration % 60)).padStart(2, '0');
+    fields.push({ name: '✂️ Crop', value: `0:00 – ${cm}:${cs}`, inline: true });
+  }
+  if (parts && parts.length) {
+    fields.push({
+      name: '🧩 Aset',
+      value: parts.map((p) => `#${p.index} \`${p.assetId}\` (${p.moderationState || 'Pending'})`).join('\n').slice(0, 900),
+      inline: false
+    });
+  }
+  if (type === 'fail' && error) fields.push({ name: '📄 Error', value: String(error).slice(0, 900), inline: false });
+  if (ms > 0) fields.push({ name: '⏳ Waktu proses', value: (ms / 1000).toFixed(1) + ' detik', inline: true });
+  fields.push({ name: '🏷️ Mode', value: (key && key.is_demo) ? 'DEMO (simulasi)' : 'Roblox Open Cloud', inline: true });
+  if (job.meta) {
+    const loc = await resolveLocation(job.meta.ip);
+    fields.push({ name: '📍 Lokasi (IP)', value: `${loc.flag} ${loc.loc} · \`${job.meta.ip}\``, inline: true });
+    fields.push({ name: '💻 Device', value: ua.browser + ' · ' + ua.os, inline: true });
+  }
+
+  return send({
+    username: 'CVA STUDIO Monitor',
+    embeds: [{ title: titles[type], color: colors[type], fields, timestamp: new Date().toISOString() }]
+  });
+}
+
+module.exports = { send, resolveLocation, trackActivity, reportClientError, reportServerError, reportConvert };
