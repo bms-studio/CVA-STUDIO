@@ -77,16 +77,24 @@ app.use('/api/history', require('./routes/history'));
 app.use('/api/permissions', require('./routes/permissions'));
 
 const toolsCache = { ts: 0, data: null };
+const YTDLP_VARIANTS = [
+  cfg.YTDLP_CMD,
+  ['python3', '-m', 'yt_dlp'],
+  ['py', '-3', '-m', 'yt_dlp'],
+  ['yt-dlp']
+];
 async function detectTools() {
   const now = Date.now();
   if (toolsCache.data && now - toolsCache.ts < 60000) return toolsCache.data;
   const ffmpegArgs = String(cfg.FFMPEG_CMD).split(/\s+/);
-  const [ff, yd] = await Promise.all([
-    media.runCmd(ffmpegArgs, ['-version'], 8000),
-    media.runCmd(cfg.YTDLP_CMD, ['--version'], 8000)
-  ]);
+  const ff = await media.runCmd(ffmpegArgs, ['-version'], 8000);
+  let ytdlp = false;
+  for (const variant of YTDLP_VARIANTS) {
+    const yd = await media.runCmd(variant, ['--version'], 8000);
+    if (yd.code === 0) { ytdlp = true; break; }
+  }
   toolsCache.ts = now;
-  toolsCache.data = { ffmpeg: ff.code === 0, ytdlp: yd.code === 0 };
+  toolsCache.data = { ffmpeg: ff.code === 0, ytdlp };
   return toolsCache.data;
 }
 
