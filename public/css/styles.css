@@ -2073,16 +2073,7 @@ body {
   50% { box-shadow: 0 4px 24px rgba(255,255,255,0.25); }
 }
 
-/* ---- Hero title letter-by-letter animation (smooth rise, no 3D flip) ---- */
-.hero-title .char {
-  display: inline-block;
-  opacity: 0;
-  animation: charReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-@keyframes charReveal {
-  from { opacity: 0; transform: translateY(26px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
+/* ---- Hero title letter-by-letter animation (disabled: glyph baseline jitter) ---- */
 
 /* ---- Feature icon soft glow pulse (replaces hard ring) ---- */
 .feature-icon {

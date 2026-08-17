@@ -97,52 +97,11 @@ function initSpotlight() {
   });
 }
 
-/* ---- Hero Title Letter Animation ---- */
-function initHeroLetters() {
-  const title = document.querySelector('.hero-title');
-  if (!title) return;
-  // Walk through text nodes only, wrap each character in a span
-  const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
-  const textNodes = [];
-  while (walker.nextNode()) {
-    const node = walker.currentNode;
-    if (node.parentElement && node.parentElement.closest('.accent-gradient')) continue; // skip accent span text
-    textNodes.push(node);
-  }
-  let charIndex = 0;
-  const delayBase = 0.15;
-  textNodes.forEach((node) => {
-    const text = node.textContent;
-    const frag = document.createDocumentFragment();
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-      if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); continue; }
-      const span = document.createElement('span');
-      span.className = 'char';
-      span.style.animationDelay = (delayBase + charIndex * 0.025) + 's';
-      span.textContent = ch;
-      frag.appendChild(span);
-      charIndex++;
-    }
-    node.parentNode.replaceChild(frag, node);
-  });
-  // Also animate accent-gradient inner text
-  const accent = title.querySelector('.accent-gradient');
-  if (accent && !accent.querySelector('.char')) {
-    const accentText = accent.textContent;
-    accent.innerHTML = '';
-    for (let i = 0; i < accentText.length; i++) {
-      const ch = accentText[i];
-      if (ch === ' ') { accent.appendChild(document.createTextNode(' ')); continue; }
-      const span = document.createElement('span');
-      span.className = 'char';
-      span.style.animationDelay = (delayBase + charIndex * 0.025) + 's';
-      span.textContent = ch;
-      accent.appendChild(span);
-      charIndex++;
-    }
-  }
-}
+/* ---- Hero Title Letter Animation (DISABLED) ----
+   Animasi per-huruf (charReveal, translateY bertahap) membuat glyph "i" pada
+   kata terakhir tampak melayang di atas/bawah garis karena delay berjenjang.
+   Judul tetap memakai animasi fadeInUp + textGlow dari .hero-title. */
+function initHeroLetters() {}
 
 /* ---- Smooth Number Counter Animation ---- */
 function initCounters() {
