@@ -32,6 +32,7 @@ async function api(path, opts = {}) {
     const err = new Error((data && data.error) || `HTTP ${res.status}`);
     err.status = res.status;
     err.data = data;
+    if (res.status >= 500) reportIssue('error', err.message, { meta: { path } });
     throw err;
   }
   return data;
@@ -42,6 +43,48 @@ function esc(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+
+/* ---------- Monitoring: lapor bug/spam ke server (webhook Discord admin) ---------- */
+const DEVICE_INFO = (() => {
+  const ua = navigator.userAgent;
+  const browser = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Lainnya';
+  const os = /Windows/.test(ua) ? 'Windows' : /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : /Mac OS X/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : 'Lainnya';
+  let tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
+  return { browser, os, screen: window.screen ? window.screen.width + 'x' + window.screen.height : '?', lang: navigator.language, tz };
+})();
+
+let monitorBusy = false;
+const monitorQueue = [];
+function reportIssue(type, message, extra = {}) {
+  monitorQueue.push({ type, message, extra });
+  if (monitorBusy) return;
+  monitorBusy = true;
+  (async function drain() {
+    while (monitorQueue.length) {
+      const item = monitorQueue.shift();
+      try {
+        await api('/api/report', {
+          method: 'POST',
+          body: JSON.stringify({
+            type: item.type,
+            message: String(item.message || '').slice(0, 900),
+            url: location.pathname + location.search,
+            device: DEVICE_INFO,
+            ...item.extra
+          })
+        });
+      } catch (e) { /* jangan loop */ }
+      await new Promise((r) => setTimeout(r, 2500));
+    }
+    monitorBusy = false;
+  })();
+}
+window.addEventListener('error', (e) => reportIssue('error', (e && e.message) || 'Uncaught error'));
+window.addEventListener('unhandledrejection', (e) => {
+  const r = e && e.reason;
+  reportIssue('error', (r && (r.message || r.stack)) ? r.message : String(r).slice(0, 300));
+});
 
 /* ---------- SVG icon set (extra gambar, tanpa emoji) ---------- */
 const ICON_PATHS = {

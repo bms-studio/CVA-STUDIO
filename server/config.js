@@ -21,6 +21,8 @@ module.exports = {
   YTDLP_EXTRA_ARGS: process.env.YTDLP_EXTRA_ARGS || '',
   FFMPEG_CMD: process.env.FFMPEG_CMD || 'ffmpeg',
   FFPROBE_CMD: process.env.FFPROBE_CMD || 'ffprobe',
+  DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL || '',
+  WEBHOOK_SPAM_THRESHOLD: process.env.WEBHOOK_SPAM_THRESHOLD || '15',
   MAX_UPLOAD_MB: 20,
   MAX_CONVERT_URL_TIME: 900000,
   DEMO_APPROVE_MIN_MS: 60000,

@@ -72,6 +72,7 @@ app.use('/api/media', mediaRouter);
 // ---- APP ROUTES ----
 app.use('/api/keys', require('./routes/keys'));
 app.use('/api', require('./routes/convert'));
+app.use('/api', require('./routes/report'));
 app.use('/api/history', require('./routes/history'));
 app.use('/api/permissions', require('./routes/permissions'));
 
@@ -102,9 +103,14 @@ app.use((err, req, res, next) => {
   if (err && err.code && String(err.code).startsWith('LIMIT_')) {
     return res.status(413).json({ error: 'File terlalu besar. Maksimal ' + cfg.MAX_UPLOAD_MB + ' MB.' });
   }
+  const status = err && err.status ? err.status : 500;
+  if (status >= 500) {
+    const webhook = require('./webhook');
+    webhook.reportServerError(req, err);
+  }
   const msg = err && err.message ? err.message : 'Internal error';
   if (res.headersSent) return next(err);
-  res.status(err && err.status ? err.status : 500).json({ error: msg });
+  res.status(status).json({ error: msg });
 });
 
 // SPA fallback

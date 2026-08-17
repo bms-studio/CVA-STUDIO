@@ -8,6 +8,7 @@ const roblox = require('../roblox');
 const media = require('../media');
 const { requireAuth } = require('../auth');
 const { pushJob } = require('../worker');
+const webhook = require('../webhook');
 
 const router = express.Router();
 
@@ -124,6 +125,7 @@ router.post('/convert', requireAuth, upload.single('file'), async (req, res) => 
       params
     });
 
+    webhook.trackActivity(user.discord_id);
     res.json({ ok: true, id: job.id });
   } catch (e) {
     res.status(400).json({ error: e.message });
@@ -159,6 +161,7 @@ router.post('/convert/batch', requireAuth, async (req, res) => {
       ids.push(job.id);
       pushJob({ historyId: job.id, userId: user.discord_id, sourceType: 'url', sourceUrl: urls[i], filePath: '', assetName: job.asset_name || baseName, apiKeyId, params });
     }
+    webhook.trackActivity(user.discord_id, urls.length);
     res.json({ ok: true, ids });
   } catch (e) {
     res.status(400).json({ error: e.message });
