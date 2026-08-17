@@ -11,6 +11,30 @@ const db = new Database(path.join(cfg.DATA_DIR, 'cva.db'));
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
+/* ---- Backup otomatis: 1x per hari saat server start (aman via better-sqlite3) ---- */
+(function autoBackup() {
+  const BACKUP_DIR = path.join(cfg.DATA_DIR, 'backup');
+  const KEEP = 10;
+  const dbFile = path.join(cfg.DATA_DIR, 'cva.db');
+  if (!fs.existsSync(dbFile)) return;
+  fs.mkdirSync(BACKUP_DIR, { recursive: true });
+  const today = new Date().toISOString().slice(0, 10);
+  const list = fs.readdirSync(BACKUP_DIR).filter((f) => f.startsWith('cva-') && f.endsWith('.db')).sort();
+  if (list.length && list[list.length - 1].includes(today)) return; // sudah backup hari ini
+  const dest = path.join(BACKUP_DIR, `cva-${today}-${Date.now().toString(36)}.db`);
+  try {
+    db.backup(dest);
+    console.log('[backup] DB tersimpan:', path.basename(dest));
+  } catch (e) {
+    console.error('[backup] gagal:', e.message);
+    return;
+  }
+  while (fs.readdirSync(BACKUP_DIR).filter((f) => f.startsWith('cva-') && f.endsWith('.db')).length > KEEP) {
+    const oldest = fs.readdirSync(BACKUP_DIR).filter((f) => f.startsWith('cva-') && f.endsWith('.db')).sort()[0];
+    try { fs.unlinkSync(path.join(BACKUP_DIR, oldest)); } catch (e) {}
+  }
+})();
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS users (
   discord_id   TEXT PRIMARY KEY,
