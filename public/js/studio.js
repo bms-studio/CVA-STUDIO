@@ -995,6 +995,12 @@ function updateConvertBtnState() {
 }
 
 /* ================= CONVERT ================= */
+async function validKeyOrRefresh(apiKeyId) {
+  if (State.keys.some((k) => k.id === apiKeyId)) return true;
+  await loadKeys();
+  return State.keys.some((k) => k.id === apiKeyId);
+}
+
 async function startConvert() {
   const url = $('#audioUrlInput').value.trim();
   const sourceType = St.file ? 'file' : url ? 'url' : null;
@@ -1004,6 +1010,10 @@ async function startConvert() {
   const params = currentFxParams();
   const apiKeyId = $('#uploaderApiKeySelect').value;
   if (!apiKeyId) return toast(t('keys.select') + '!', 'warning');
+  if (!(await validKeyOrRefresh(apiKeyId))) {
+    $('#uploaderApiKeySelect').value = '';
+    return toast(t('keys.stale'), 'error');
+  }
   const assetName = $('#assetNameInput').value.trim() || State.studio.title || 'CVA Audio';
 
   busy(true);
@@ -1132,6 +1142,10 @@ async function runBatchConvert() {
   const apiKeyId = $('#batchApiKeySelect').value;
   if (!urls.length) return toast(t('studio.batchEmpty'), 'warning');
   if (!apiKeyId) return toast(t('keys.select') + '!', 'warning');
+  if (!(await validKeyOrRefresh(apiKeyId))) {
+    $('#batchApiKeySelect').value = '';
+    return toast(t('keys.stale'), 'error');
+  }
   const params = currentFxParams();
   busy(true);
   try {

@@ -8,7 +8,7 @@ async function renderOverview(isLangRefresh) {
   const cfgS = State.config || {};
   await Promise.allSettled([
     !('tools' in cfgS) ? loadConfig() : Promise.resolve(),
-    !State.keys.length ? loadKeys() : Promise.resolve(),
+    loadKeys(),
     !State.history.length ? loadHistory() : Promise.resolve()
   ]);
   const keysList = State.keys || [];
